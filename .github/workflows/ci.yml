@@ -1,0 +1,18 @@
+name: CI/CD + boucle de rétroaction
+
+on:
+  push: { branches: [main], tags: ["v*"] }
+  workflow_dispatch:        # déclenchement manuel du réentraînement
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: pytest -v tests
+  # TODO — job `auto-retrain-trigger` (needs: test, if: workflow_dispatch) :
+  #   pip install -r requirements.txt ; python scripts/retrain.py --min-feedback 200
+  #   (bloque si contract test / éval KO ; en succès : tag v2.1.0 → CI/CD M5)
