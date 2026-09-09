@@ -1,7 +1,20 @@
 # M6-B2 — Implémenter la boucle de rétroaction complète (Pyrenex, binôme)
 
-> **Repo template.** Un binôme fait **« Use this template »** →
-> `M6-B2-pyrenex-boucle-<binome>` et invite l'autre membre en collaborateur.
+> ⚠️ **Ce repo n'est pas un projet autonome — c'est un layer additif.**
+> Il n'a **ni `docker-compose.yml`, ni Prometheus, ni Grafana, ni service model,
+> ni backend**. Vous ne pouvez rien démarrer avec lui seul.
+>
+> **La base, c'est votre repo binôme M5-B1** : c'est lui qui porte la stack, la CI
+> vers GHCR et votre `evaluate_model.py`. Travaillez-y sur une branche
+> `m6-b2-boucle`, et **déposez-y quatre choses prises ici** : `services/feedback/`,
+> `scripts/retrain` + `promotion`, `data/feedbacks_simules.csv`, et le job
+> `auto-retrain-trigger` du `ci.yml`.
+>
+> Vous pouvez aussi faire **« Use this template »** → `M6-B2-pyrenex-boucle-<binome>`
+> pour repartir propre, mais il faudra y rapatrier une douzaine d'éléments depuis M5
+> (compose, prometheus/, grafana/, les 3 services, `evaluate_model.py`, votre jeu de
+> référence et vos seuils) et fusionner les deux `ci.yml`. Comptez une heure.
+>
 > Vous restez avec le binôme de M6-B1 : vous continuez sur votre diagnostic.
 
 ---
