@@ -86,13 +86,24 @@ mais **switchez à mi-parcours** : à la fin, chacun doit avoir écrit la partie
 qui compte — la **décision de promotion**. En soutenance de certification, vous
 serez seul·e à expliquer cette boucle.
 
-| Brique | À faire | Fichier | Mini-cours |
-|---|---|---|---|
-| A — Endpoint | `POST /feedback` : valide, stocke, 404 / 409 / idempotent | `services/feedback/` | `01` |
-| B — Stockage | SQLite + `used_for_training` + jointure `request_id` | (idem) | `02` |
-| C — Réentraînement | `retrain.py` : données → **candidat** → évaluation | `scripts/retrain_TEMPLATE.py` | `04` |
-| D — **Promotion** | `decide_promotion()` : la règle qui autorise le déploiement | `scripts/promotion_TEMPLATE.py` | `04`, `05` |
-| E — Trigger + CI | cron / `workflow_dispatch`, garde-seuil | `crontab_TEMPLATE.txt`, `.github/workflows/ci.yml` | `03` |
+| | Brique | Dépend de | Fichier | Mini-cours |
+|---|---|---|---|---|
+| **A** | **La décision de promotion** — `decide_promotion()`, la règle qui autorise le déploiement | **rien** — testable sur des métriques inventées | `scripts/promotion_TEMPLATE.py` | `04`, `05` |
+| **B** | Endpoint `POST /feedback` : valide, stocke, 404 / 409 / idempotent | rien | `services/feedback/` | `01` |
+| **C** | Stockage SQLite + `used_for_training` + comptage des **non consommés** | B | (idem) | `02` |
+| **D** | Réentraînement : données → **candidat** → évaluation → appelle A | C et A | `scripts/retrain_TEMPLATE.py` | `04` |
+| **E** | Trigger cron / `workflow_dispatch` + CI/CD | D | `crontab_TEMPLATE.txt`, `.github/workflows/ci.yml` | `03` |
+
+> 🧭 **L'ordre des lettres est l'ordre de construction — pas celui du schéma
+> d'architecture.** Le schéma décrit un flux ; on construit **du plus testable au
+> plus dépendant**. La décision de promotion ne dépend de rien : ni base, ni modèle,
+> ni feedback. Commencez par elle, et **chacun de vous deux** doit l'avoir écrite.
+
+> ❓ **« Comment figer un seuil avant d'avoir vu le résultat du réentraînement ? »**
+> Votre seuil ne vient pas du résultat. Le plancher absolu vient de vos **seuils
+> M5-B2** ; la tolérance et le gain minimum viennent du **coût métier** d'une
+> régression chez Pyrenex. Un seuil fixé après coup n'est plus un garde-fou, c'est
+> une justification.
 
 > ⚠️ **Deux questions distinctes.** Le **trigger** répond à *« pourquoi
 > réentraîner ? »*. La **promotion** répond à *« pourquoi déployer ? »*. Un
