@@ -28,6 +28,22 @@ pourquoi pas le total ? _…_
 ⭐ Second déclencheur « ou dérive confirmée » (bonus) : _traité / non traité_ —
 si traité, quelle fonction de M6-B1 est appelée ? _…_
 
+## Jeu de référence retenu (à figer AVANT tout le reste)
+
+**Jeu adopté** : _reference_set.csv de M5-B2 de ____ (500 lignes, composition ____)_
+_ou_ _celui livré avec le template (1500 lignes, 17,5 % de défauts)_
+
+**Pourquoi** : _…_
+
+**Si vous avez gardé le jeu du template** : golden run regelé (`--freeze-baseline`)
+le _…_ et bootstrap refait le _…_ → tolérances recalculées : _…_
+**Sinon**, vos seuils M5-B2 s'appliquent tels quels.
+
+> ⚠️ Le plancher de qualité de la politique de promotion vient de vos **seuils
+> M5-B2**, calibrés sur **votre** jeu. Mesurer les métriques sur un autre jeu
+> revient à comparer deux populations : sur un modèle **inchangé**, l'écart va
+> de 0.01 à 0.23 selon la composition. Un seul jeu, du début à la fin.
+
 ## Politique de promotion
 
 | Paramètre | Valeur retenue | Justification |

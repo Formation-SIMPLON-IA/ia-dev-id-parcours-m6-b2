@@ -8,16 +8,22 @@
 
 Les feedbacks collectés doivent être **stockés proprement** pour servir au
 réentraînement : sans intégrité (doublons, écrasements) ni traçabilité, la
-boucle réentraîne sur de la donnée sale. Deux options : **SQLite** (intégrité,
-PK, jointures) ou **CSV versionné** (simple, lisible). Le choix se justifie en
-groupe — il y a des arbitrages réels.
+boucle réentraîne sur de la donnée sale. Ici le stockage est **imposé :
+SQLite**, hérité de M3 — vous connaissez déjà le module `sqlite3`, le schéma
+et la jointure. L'alternative **CSV versionné** est présentée plus bas pour que
+vous sachiez *pourquoi* elle est écartée : c'est l'arbitrage qu'il faut savoir
+défendre, pas le choix qu'il faut refaire. Ce que vous tranchez dans
+`decisions.md`, c'est le **schéma**, la **politique de doublon** et la gestion
+de `used_for_training`.
 
 ## Concepts clés
 
-- **SQLite** : base fichier, PK sur `request_id` (anti-doublon), jointures SQL
-  vers `prod_scored`. Robuste à la concurrence d'écriture (utile à 8).
-- **CSV versionné** : simple, lisible dans Git, mais **pas de garantie
-  d'unicité** ni de gestion de la concurrence — risqué à plusieurs.
+- **SQLite** (imposé, hérité de M3) : base fichier, PK sur `request_id`
+  (anti-doublon), jointures SQL vers `prod_scored`. Robuste à la concurrence
+  d'écriture — utile dès qu'on est deux à pousser des feedbacks.
+- **CSV versionné** (alternative écartée) : simple, lisible dans Git, mais
+  **pas de garantie d'unicité** ni de gestion de la concurrence — et un
+  conflit de merge à chaque ligne ajoutée par le binôme.
 - **Schéma minimal** : `request_id (PK)`, `true_label`, `comments`, `created_at`,
   **`used_for_training` (défaut 0)**.
 - ⚠️ **`used_for_training` n'est pas un luxe** : sans lui, le trigger compte le
@@ -76,7 +82,7 @@ print(f"total={total} | non consommés={new}")   # c'est `new` qui pilote le tri
 
 | Piège | Conséquence |
 |---|---|
-| CSV à 8 sans verrou | écritures concurrentes corrompues |
+| CSV sans verrou à deux mains | écritures concurrentes corrompues, conflits de merge à chaque feedback |
 | Pas de PK | doublons → réentraînement biaisé |
 | `INSERT OR REPLACE` pour « gérer » les doublons | écrase silencieusement une vérité terrain ; en SQLite c'est un DELETE+INSERT, avec effets de bord sur les contraintes |
 | Compter le total pour le trigger | réentraînements en boucle sur les mêmes données |
@@ -89,7 +95,7 @@ print(f"total={total} | non consommés={new}")   # c'est `new` qui pilote le tri
 | Une vérité terrain a disparu sans trace | `INSERT OR REPLACE` : il écrase (voire supprime puis réinsère la ligne) |
 | Le cron réentraîne en boucle | le trigger compte le total au lieu des non-consommés |
 | Jointure vide | `request_id` non aligné entre feedback et prod |
-| Conflits Git sur le CSV | choix CSV inadapté au travail à 8 |
+| Conflits Git sur le CSV | stockage fichier plat inadapté dès qu'on écrit à deux |
 
 ## Pour aller plus loin
 
@@ -98,13 +104,15 @@ print(f"total={total} | non consommés={new}")   # c'est `new` qui pilote le tri
 
 ## Vérification (checklist apprenant)
 
-- [ ] Le choix SQLite/CSV est tranché et justifié dans `decisions.md`.
+- [ ] Le schéma, la politique de doublon et `used_for_training` sont tranchés et justifiés dans `decisions.md`.
+- [ ] Je sais expliquer pourquoi SQLite plutôt qu'un CSV versionné.
 - [ ] Schéma avec PK `request_id` + horodatage.
 - [ ] Jointure feedbacks ⋈ prod_scored fonctionnelle.
 - [ ] Pas de doublon à la ré-insertion.
 - [ ] Pas de PII stockée.
 
-> 💡 **Récap** : à 8 sur un repo, **SQLite** l'emporte souvent sur le CSV (intégrité,
-> PK anti-doublon, pas de conflit de concurrence). Schéma minimal `request_id (PK)` /
+> 💡 **Récap** : **SQLite** est imposé (héritage M3) et l'emporte sur le CSV
+> versionné dès qu'on écrit à plusieurs (intégrité, PK anti-doublon, pas de
+> conflit de concurrence). Schéma minimal `request_id (PK)` /
 > `true_label` / `comments` / `created_at`. La **jointure** vers `prod_scored` récupère
 > les features pour le réentraînement. RGPD : pas de PII dans la table de feedback.

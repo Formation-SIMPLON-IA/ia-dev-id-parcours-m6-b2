@@ -78,6 +78,14 @@ def main() -> int:
     #          (en prod : git tag v2.1.0 + push).
     #          Si REJECT : aucun tag, aucun fichier v2.1.0 — et return 0.
     #          Un rejet est une décision normale, pas un plantage.
+    #
+    #          ⚠️ Les métadonnées ont un CONTRAT. Le service `model` de M5 lit
+    #          metrics_holdout, sklearn_version et dataset_sha256 en accès
+    #          direct : un JSON écrit de zéro avec vos seules clés fait démarrer
+    #          le service, répondre /predict… et planter /info en 500 (KeyError).
+    #          Repartez du JSON de production et surchargez ce qui change.
+    #          Et recalculez dataset_sha256 sur le jeu réellement utilisé :
+    #          hérité tel quel, il décrit le dataset de v2.0.0 — il ment.
     raise NotImplementedError
 
 

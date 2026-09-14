@@ -79,6 +79,13 @@ python scripts/retrain.py --min-feedback 200      # une fois retrain.py complét
 Données fournies : `data/feedbacks_simules.csv` (200 à injecter), `prod_scored.csv`,
 `lending_club_train.csv`, `reference_set.csv`. Modèle de base : `models/pyrenex_risk_v2.joblib`.
 
+> ⚠️ **Premier geste : trancher le jeu de référence.** Le `data/reference_set.csv`
+> livré ici fait **1500 lignes (17,5 % de défauts)** — ce n'est **pas** celui de
+> votre M5-B2 (500 lignes). Or le plancher de votre politique de promotion vient
+> de vos **seuils M5-B2**, calibrés sur *votre* jeu. Par défaut : **remplacez ce
+> fichier par le vôtre**. Sinon, regelez le golden run et refaites le bootstrap.
+> Décision + raison dans `decisions.md` (section « Jeu de référence retenu »).
+
 ## 🧭 Ce que vous construisez
 
 Vous construisez **la boucle entière**, à deux. Répartissez-vous les briques,
